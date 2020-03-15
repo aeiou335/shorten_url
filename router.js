@@ -13,30 +13,19 @@ client.on('connect', () => {
 const express = require("express");
 const router = express.Router();
 const randomstring = require("randomstring");
-const url = require("url");
+const validUrl = require('valid-url');
 
 const prefix = "localhost:4001/"
 
 router.post("/shorten", async (req, res) => {
     console.log(req.body)
     const request_url = req.body.url;
-    /*
-    try {
-        const parse = await url.parse(request_url);
-        console.log(parse)
-    } catch(err) {
-        console.log(err)
-        res.json({
-            sucess: false,
-            data: "",
-            msg: "The url is not valid."
-        })
-    }    
-    */
+    
     let stop = false;
     let count = 0;
+    let length = 2;
     while (!stop && count < 3) {
-        const newString = randomstring.generate(2);
+        const newString = randomstring.generate(length);
         console.log(newString)
         const reply = await getAsync(newString);
         console.log(reply);
@@ -60,7 +49,13 @@ router.post("/shorten", async (req, res) => {
             
         }
         count += 1;
+        if (count === 3) {
+            count = 0;
+            length += 1;
+        }
     }
+
+    
 })
 
 router.get("/:id", async (req, res) => {
